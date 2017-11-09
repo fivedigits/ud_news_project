@@ -2,7 +2,7 @@
 
 This is a small python script which prints diagnostics
 for the news database. The output of the program can be
-found in [RESULTS.txt].
+found in [RESULTS.txt](./RESULTS.txt).
 
 ## Dependencies
 You need to have a current version of python3 and psycopg2
