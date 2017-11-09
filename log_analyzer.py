@@ -1,4 +1,4 @@
-#!/bin/env python3
+#!/usr/bin/env python3
 
 """ This script prints out diagnostic information from the news database."""
 
