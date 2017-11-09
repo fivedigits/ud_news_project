@@ -41,6 +41,12 @@ def print_views(views_list):
         print('{} - {} views'.format(item[0], item[1]))
 
 
+def print_dates(dates_list):
+    """Prettyprints dates_list from cursor.fetchall()."""
+    for item in dates_list:
+        print(str(item[0][0]))
+
+
 if __name__ == '__main__':
 
     # Open connection to database and get a cursor.
