@@ -44,7 +44,7 @@ def print_views(views_list):
 def print_dates(dates_list):
     """Prettyprints dates_list from cursor.fetchall()."""
     for item in dates_list:
-        print(str(item[0][0]))
+        print(str(item[0]))
 
 
 if __name__ == '__main__':
@@ -63,7 +63,7 @@ if __name__ == '__main__':
 
     print(linesep + "Days with more than 1% failed connections" + linesep)
     curs.execute(NOT_FOUND_QUERY)
-    print(str(curs.fetchall()[0][0]) + linesep)
+    print_dates(curs.fetchall())
 
     # Close database cursor and connection.
     curs.close()
