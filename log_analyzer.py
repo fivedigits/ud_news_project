@@ -2,6 +2,7 @@
 
 import psycopg2
 from pprint import pprint
+from os import linesep
 
 ARTICLES_QUERY = """select articles.title, count(log.status) as views 
                     from articles 
@@ -31,17 +32,22 @@ NOT_FOUND_QUERY = """select by_status.day
                     on by_status.day = total.day 
                        and (100 * by_status.err) > total.requests;"""
 
+def print_views(views_list):
+    """Prettyprints result_list from cursor.fetchall()."""
+    for item in views_list:
+        print('{} - {} views'.format(item[0],item[1]))
+
 if __name__ == '__main__':
     db = psycopg2.connect("dbname=news")
     cursor = db.cursor()
-    print("Articles -- Views")
+    print(linesep + "Most popular articles in descending order" + linesep)
     cursor.execute(ARTICLES_QUERY)
-    pprint(cursor.fetchall())
-    print("Authors -- Views")
+    print_views(cursor.fetchall())
+    print(linesep + "Most popular authors in descending order" + linesep)
     cursor.execute(AUTHOR_QUERY)
-    pprint(cursor.fetchall())
-    print("Days with more than 1% failed connections")
+    print_views(cursor.fetchall())
+    print(linesep + "Days with more than 1% failed connections" + linesep)
     cursor.execute(NOT_FOUND_QUERY)
-    pprint(cursor.fetchall())
+    print(str(cursor.fetchall()[0][0]) + linesep)
     cursor.close()
     db.close()
