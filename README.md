@@ -1,4 +1,4 @@
-# Log Analysation for Udacity
+# Log Analyzation for Udacity
 
 This is a small python script which prints diagnostics
 for the news database. The output of the program can be
