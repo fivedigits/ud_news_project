@@ -1,53 +1,64 @@
 #!/bin/env python3
 
-import psycopg2
-from pprint import pprint
-from os import linesep
+""" This script prints out diagnostic information from the news database."""
 
-ARTICLES_QUERY = """select articles.title, count(log.status) as views 
-                    from articles 
-                    left join log 
-                    on articles.slug = split_part(log.path,'/',3) 
-                    group by articles.title 
+from os import linesep
+import psycopg2
+
+ARTICLES_QUERY = """select articles.title, count(log.status) as views
+                    from articles
+                    left join log
+                    on articles.slug = split_part(log.path,'/',3)
+                    group by articles.title
                     order by views desc;"""
 
-AUTHOR_QUERY = """select authors.name, raw.views 
-                  from authors 
-                  left join (select articles.author as id, count(log.path) as views 
-                             from articles 
-                             left join log 
-                             on articles.slug = split_part(log.path,'/',3) 
-                             group by articles.author) as raw 
-                  on authors.id = raw.id 
+AUTHOR_QUERY = """select authors.name, raw.views
+                  from authors
+                  left join (select articles.author as id
+                             , count(log.path) as views
+                             from articles
+                             left join log
+                             on articles.slug = split_part(log.path,'/',3)
+                             group by articles.author) as raw
+                  on authors.id = raw.id
                   order by raw.views desc;"""
 
-NOT_FOUND_QUERY = """select by_status.day 
-                    from (select date(time) as day, count(status) as err 
-                          from log 
-                          where status!='200 OK' 
-                          group by day) as by_status 
-                    join (select date(time) as day, count(*) as requests 
-                          from log 
-                          group by day) as total 
-                    on by_status.day = total.day 
+NOT_FOUND_QUERY = """select by_status.day
+                    from (select date(time) as day, count(status) as err
+                          from log
+                          where status!='200 OK'
+                          group by day) as by_status
+                    join (select date(time) as day, count(*) as requests
+                          from log
+                          group by day) as total
+                    on by_status.day = total.day
                        and (100 * by_status.err) > total.requests;"""
 
+
 def print_views(views_list):
-    """Prettyprints result_list from cursor.fetchall()."""
+    """Prettyprints views_list from cursor.fetchall()."""
     for item in views_list:
-        print('{} - {} views'.format(item[0],item[1]))
+        print('{} - {} views'.format(item[0], item[1]))
+
 
 if __name__ == '__main__':
+
+    # Open connection to database and get a cursor.
     db = psycopg2.connect("dbname=news")
-    cursor = db.cursor()
+    curs = db.cursor()
+
     print(linesep + "Most popular articles in descending order" + linesep)
-    cursor.execute(ARTICLES_QUERY)
-    print_views(cursor.fetchall())
+    curs.execute(ARTICLES_QUERY)
+    print_views(curs.fetchall())
+
     print(linesep + "Most popular authors in descending order" + linesep)
-    cursor.execute(AUTHOR_QUERY)
-    print_views(cursor.fetchall())
+    curs.execute(AUTHOR_QUERY)
+    print_views(curs.fetchall())
+
     print(linesep + "Days with more than 1% failed connections" + linesep)
-    cursor.execute(NOT_FOUND_QUERY)
-    print(str(cursor.fetchall()[0][0]) + linesep)
-    cursor.close()
+    curs.execute(NOT_FOUND_QUERY)
+    print(str(curs.fetchall()[0][0]) + linesep)
+
+    # Close database cursor and connection.
+    curs.close()
     db.close()
