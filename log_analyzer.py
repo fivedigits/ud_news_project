@@ -24,28 +24,24 @@ AUTHOR_QUERY = """select authors.name, raw.views
                   on authors.id = raw.id
                   order by raw.views desc;"""
 
-NOT_FOUND_QUERY = """select to_char(by_status.day, 'YYYY-MM-DD'), trunc((100.0 * by_status.err) / total.requests,2)
-                    from (select date(time) as day, count(status) as err
+NOT_FOUND_QUERY = """select to_char(by_status.day, 'YYYY-MM-DD')
+                     , trunc((100.0 * by_status.err) / total.requests,2)
+                     from (select date(time) as day, count(status) as err
                           from log
                           where status!='200 OK'
                           group by day) as by_status
-                    join (select date(time) as day, count(*) as requests
+                     join (select date(time) as day, count(*) as requests
                           from log
                           group by day) as total
-                    on by_status.day = total.day
+                     on by_status.day = total.day
                        and (100 * by_status.err) > total.requests;"""
 
 
-def print_views(views_list):
-    """Prettyprints views_list from cursor.fetchall()."""
-    for item in views_list:
-        print('{} - {} views'.format(item[0], item[1]))
-
-
-def print_dates(dates_list):
-    """Prettyprints dates_list from cursor.fetchall()."""
-    for item in dates_list:
-        print('{} - {}'.format(item[0],item[1]))
+def print_result(result_list, suffix):
+    """Prettyprints result_list with 2 colums from cursor.fetchall()
+       and appends suffix for each row."""
+    for item in result_list:
+        print('{} - {} '.format(item[0], item[1]) + suffix)
 
 
 if __name__ == '__main__':
@@ -56,15 +52,15 @@ if __name__ == '__main__':
 
     print(linesep + "Most popular articles in descending order" + linesep)
     curs.execute(ARTICLES_QUERY)
-    print_views(curs.fetchall())
+    print_result(curs.fetchall(), "views")
 
     print(linesep + "Most popular authors in descending order" + linesep)
     curs.execute(AUTHOR_QUERY)
-    print_views(curs.fetchall())
+    print_result(curs.fetchall(), "views")
 
     print(linesep + "Days with more than 1% failed connections" + linesep)
     curs.execute(NOT_FOUND_QUERY)
-    print_dates(curs.fetchall())
+    print_result(curs.fetchall(), "%")
 
     # Close database cursor and connection.
     curs.close()
