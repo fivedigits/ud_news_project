@@ -60,7 +60,7 @@ if __name__ == '__main__':
 
     print(linesep + "Days with more than 1% failed connections" + linesep)
     curs.execute(NOT_FOUND_QUERY)
-    print_result(curs.fetchall(), "%")
+    print_result(curs.fetchall(), "% errors")
 
     # Close database cursor and connection.
     curs.close()
