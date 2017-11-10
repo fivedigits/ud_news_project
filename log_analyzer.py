@@ -10,7 +10,8 @@ ARTICLES_QUERY = """select articles.title, count(log.status) as views
                     left join log
                     on articles.slug = split_part(log.path,'/',3)
                     group by articles.title
-                    order by views desc;"""
+                    order by views desc
+                    limit 3;"""
 
 AUTHOR_QUERY = """select authors.name, raw.views
                   from authors
@@ -23,7 +24,7 @@ AUTHOR_QUERY = """select authors.name, raw.views
                   on authors.id = raw.id
                   order by raw.views desc;"""
 
-NOT_FOUND_QUERY = """select by_status.day
+NOT_FOUND_QUERY = """select to_char(by_status.day, 'YYYY-MM-DD'), trunc((100.0 * by_status.err) / total.requests,2)
                     from (select date(time) as day, count(status) as err
                           from log
                           where status!='200 OK'
@@ -44,7 +45,7 @@ def print_views(views_list):
 def print_dates(dates_list):
     """Prettyprints dates_list from cursor.fetchall()."""
     for item in dates_list:
-        print(str(item[0]))
+        print('{} - {}'.format(item[0],item[1]))
 
 
 if __name__ == '__main__':
