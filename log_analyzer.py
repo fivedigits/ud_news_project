@@ -24,7 +24,7 @@ AUTHOR_QUERY = """select authors.name, raw.views
                   on authors.id = raw.id
                   order by raw.views desc;"""
 
-NOT_FOUND_QUERY = """select to_char(by_status.day, 'YYYY-MM-DD')
+NOT_FOUND_QUERY = """select to_char(by_status.day, 'Mon DD,YYYY')
                      , trunc((100.0 * by_status.err) / total.requests,2)
                      from (select date(time) as day, count(status) as err
                           from log

@@ -14,4 +14,4 @@ Markoff Chaney - 84557 views
 
 Days with more than 1% failed connections
 
-2016-07-17 - 2.26 %
+Jul 17,2016 - 2.26 % errors
